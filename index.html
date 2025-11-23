@@ -2,75 +2,95 @@
 <html lang="es">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Bienvenido al sistema de apartado de proyector del Instituto Tecnológico de Oaxaca</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Registro de Apartado</title>
   <style>
-    body { font-family: Segoe UI, Arial, sans-serif; background:#f6f7fb; margin:0; padding:20px; }
-    h1 { margin-bottom:15px; }
-    table { width:100%; border-collapse:collapse; background:white; box-shadow:0 4px 12px rgba(0,0,0,0.1); }
-    th, td { padding:10px; border-bottom:1px solid #eee; font-size:14px; }
-    th { background:#007bff; color:white; text-align:left; }
+    body { font-family: Segoe UI, Arial, sans-serif; background:#eef2f7; padding:20px; }
+    h1 { text-align:center; color:#003366; }
+    form { 
+      max-width:500px; margin:0 auto; 
+      background:white; padding:20px; border-radius:8px;
+      box-shadow:0 4px 12px rgba(0,0,0,0.1);
+    }
+    label { display:block; margin-top:12px; font-weight:bold; }
+    input, select {
+      width:100%; padding:10px; border:1px solid #ccc; border-radius:5px; margin-top:5px;
+    }
+    button {
+      margin-top:15px; padding:12px; width:100%;
+      background:#007bff; border:none; color:white;
+      border-radius:5px; font-size:16px; cursor:pointer;
+    }
   </style>
 </head>
 <body>
 
-<h1>Bienvenido al sistema de apartado de proyector del Instituto Tecnológico de Oaxaca</h1>
+<h1>Bienvenido al Sistema de Apartado de Proyector del Instituto Tecnológico de Oaxaca</h1>
 
-<table>
-  <thead>
-    <tr>
-      <th>Fecha</th>
-      <th>Horario</th>
-      <th>Alumno</th>
-      <th>Número de Control</th>
-      <th>Aula</th>
-      <th>Material</th>
-      <th>Carrera</th>
-    </tr>
-  </thead>
-  <tbody id="tbody"></tbody>
-</table>
+<form id="form">
+  
+  <label>Nombre del Alumno</label>
+  <input type="text" id="nombre" required>
+
+  <label>Número de Control</label>
+  <input type="text" id="matricula" required>
+
+  <label>Carrera</label>
+  <input type="text" id="carrera" required>
+
+  <label>Aula</label>
+  <input type="text" id="aula" required>
+
+  <label>Material</label>
+  <select id="material" multiple>
+    <option value="Proyector">Proyector</option>
+    <option value="Cable HDMI">Cable HDMI</option>
+    <option value="Control">Control</option>
+  </select>
+
+  <label>Horario</label>
+  <select id="hora" required>
+    <option value="7am - 8am">7am - 8am</option>
+    <option value="8am - 9am">8am - 9am</option>
+    <option value="9am - 10am">9am - 10am</option>
+    <option value="10am - 11am">10am - 11am</option>
+    <option value="11am - 12pm">11am - 12pm</option>
+    <option value="12pm - 1pm">12pm - 1pm</option>
+    <option value="1pm - 2pm">1pm - 2pm</option>
+    <option value="2pm - 3pm">2pm - 3pm</option>
+    <option value="3pm - 4pm">3pm - 4pm</option>
+    <option value="4pm - 5pm">4pm - 5pm</option>
+    <option value="5pm - 6pm">5pm - 6pm</option>
+    <option value="6pm - 7pm">6pm - 7pm</option>
+    <option value="7pm - 8pm">7pm - 8pm</option>
+  </select>
+
+  <label>Fecha</label>
+  <input type="date" id="fecha" required>
+
+  <button type="submit">Guardar Registro</button>
+</form>
 
 <script>
-const registros = JSON.parse(localStorage.getItem("apartados") || "[]");
-const tbody = document.getElementById("tbody");
+document.getElementById("form").addEventListener("submit", e => {
+  e.preventDefault();
+  
+  const registros = JSON.parse(localStorage.getItem("apartados") || "[]");
 
-// Convierte "07:00 AM" a "7AM-8AM"
-function formatoRango(horaStr) {
-  if (!horaStr) return "N/A";
+  registros.push({
+    nombre: document.getElementById("nombre").value,
+    matricula: document.getElementById("matricula").value,
+    carrera: document.getElementById("carrera").value,
+    aula: document.getElementById("aula").value,
+    material: Array.from(document.getElementById("material").selectedOptions).map(o => o.value),
+    hora: document.getElementById("hora").value,
+    fecha: document.getElementById("fecha").value
+  });
 
-  // Ejemplo: "07:00 AM"
-  let [horaMinuto, periodo] = horaStr.split(" ");
-  let [h] = horaMinuto.split(":").map(Number);
-
-  // Convertir a 24h para calcular la hora siguiente
-  let hora24 = periodo === "PM" && h !== 12 ? h + 12 : h;
-  if (periodo === "AM" && h === 12) hora24 = 0;
-
-  let siguiente = (hora24 + 1) % 24;
-
-  // Función para formatear AM/PM limpio
-  const f = hr => {
-    const suf = hr >= 12 ? "PM" : "AM";
-    let h12 = hr % 12;
-    if (h12 === 0) h12 = 12;
-    return `${h12}${suf}`;
-  };
-
-  return `${f(hora24)}-${f(siguiente)}`;
-}
-
-tbody.innerHTML = registros.map(r => `
-  <tr>
-    <td>${r.fecha}</td>
-    <td>${formatoRango(r.hora)}</td>
-    <td>${r.nombre}</td>
-    <td>${r.numeroControl || "N/A"}</td>
-    <td>${r.aula}</td>
-    <td>${(r.material || []).join(', ')}</td>
-    <td>${r.carrera}</td>
-  </tr>
-`).join("");
+  localStorage.setItem("apartados", JSON.stringify(registros));
+  alert("Registro guardado correctamente");
+  e.target.reset();
+});
 </script>
 
 </body>
