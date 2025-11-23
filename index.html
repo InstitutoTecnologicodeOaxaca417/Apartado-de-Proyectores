@@ -1,61 +1,77 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema de Apartado de Proyector</title>
-    <style>
-        body { font-family: Arial, sans-serif; background: #f2f2f2; padding: 20px; }
-        .container { background: white; padding: 20px; border-radius: 10px; width: 450px; margin: auto; box-shadow: 0 0 10px rgba(0,0,0,0.1);}        
-        label { font-weight: bold; }
-        select, input, textarea { width: 100%; padding: 8px; margin: 6px 0 15px; }
-        button { padding: 10px; width: 100%; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; }
-        button:hover { background: #0056b3; }
-    </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Bienvenido al sistema de apartado de proyector del Instituto Tecnológico de Oaxaca</title>
+  <style>
+    body { font-family: Segoe UI, Arial, sans-serif; background:#f6f7fb; margin:0; padding:20px; }
+    h1 { margin-bottom:15px; }
+    table { width:100%; border-collapse:collapse; background:white; box-shadow:0 4px 12px rgba(0,0,0,0.1); }
+    th, td { padding:10px; border-bottom:1px solid #eee; font-size:14px; }
+    th { background:#007bff; color:white; text-align:left; }
+  </style>
 </head>
 <body>
 
-<div class="container">
-    <h2>Sistema de Apartado de Proyector</h2>
+<h1>Bienvenido al sistema de apartado de proyector del Instituto Tecnológico de Oaxaca</h1>
 
-    <form>
-        <label>Fecha de apartado:</label>
-        <input type="date" required>
+<table>
+  <thead>
+    <tr>
+      <th>Fecha</th>
+      <th>Horario</th>
+      <th>Alumno</th>
+      <th>Número de Control</th>
+      <th>Aula</th>
+      <th>Material</th>
+      <th>Carrera</th>
+    </tr>
+  </thead>
+  <tbody id="tbody"></tbody>
+</table>
 
-        <label>Nombre del alumno:</label>
-        <input type="text" placeholder="Escribe el nombre" required>
+<script>
+const registros = JSON.parse(localStorage.getItem("apartados") || "[]");
+const tbody = document.getElementById("tbody");
 
-        <label>Aula:</label>
-        <input type="text" placeholder="Ej: B12" required>
+// Convierte "07:00 AM" a "7AM-8AM"
+function formatoRango(horaStr) {
+  if (!horaStr) return "N/A";
 
-        <label>Hora:</label>
-        <input type="time" required>
+  // Ejemplo: "07:00 AM"
+  let [horaMinuto, periodo] = horaStr.split(" ");
+  let [h] = horaMinuto.split(":").map(Number);
 
-        <label>Material y equipo:</label>
-        <select multiple required>
-            <option>Proyector</option>
-            <option>Extensión</option>
-            <option>Cable HDMI</option>
-            <option>Cable</option>
-        </select>
+  // Convertir a 24h para calcular la hora siguiente
+  let hora24 = periodo === "PM" && h !== 12 ? h + 12 : h;
+  if (periodo === "AM" && h === 12) hora24 = 0;
 
-        <label>Carrera:</label>
-        <select required>
-            <option>Ingeniería en Sistemas Computacionales</option>
-            <option>Ingeniería Civil</option>
-            <option>Ingeniería Química</option>
-            <option>Ingeniería Industrial</option>
-            <option>Ingeniería en Gestión Empresarial</option>
-            <option>Ingeniería Mecánica</option>
-            <option>Ingeniería Eléctrica</option>
-            <option>Ingeniería Electrónica</option>
-            <option>Licenciatura en Administración</option>
-            <option>Licenciatura en Contador Público</option>
-        </select>
+  let siguiente = (hora24 + 1) % 24;
 
-        <button type="submit">Registrar Apartado</button>
-    </form>
-</div>
+  // Función para formatear AM/PM limpio
+  const f = hr => {
+    const suf = hr >= 12 ? "PM" : "AM";
+    let h12 = hr % 12;
+    if (h12 === 0) h12 = 12;
+    return `${h12}${suf}`;
+  };
+
+  return `${f(hora24)}-${f(siguiente)}`;
+}
+
+tbody.innerHTML = registros.map(r => `
+  <tr>
+    <td>${r.fecha}</td>
+    <td>${formatoRango(r.hora)}</td>
+    <td>${r.nombre}</td>
+    <td>${r.numeroControl || "N/A"}</td>
+    <td>${r.aula}</td>
+    <td>${(r.material || []).join(', ')}</td>
+    <td>${r.carrera}</td>
+  </tr>
+`).join("");
+</script>
 
 </body>
 </html>
