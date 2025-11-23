@@ -3,15 +3,17 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Registro de Apartado</title>
+  <title>Sistema de Apartado</title>
   <style>
     body { font-family: Segoe UI, Arial, sans-serif; background:#eef2f7; padding:20px; }
     h1 { text-align:center; color:#003366; }
+
     form { 
       max-width:500px; margin:0 auto; 
       background:white; padding:20px; border-radius:8px;
       box-shadow:0 4px 12px rgba(0,0,0,0.1);
     }
+
     label { display:block; margin-top:12px; font-weight:bold; }
     input, select {
       width:100%; padding:10px; border:1px solid #ccc; border-radius:5px; margin-top:5px;
@@ -21,6 +23,13 @@
       background:#007bff; border:none; color:white;
       border-radius:5px; font-size:16px; cursor:pointer;
     }
+
+    table {
+      width:100%; border-collapse:collapse; background:white; margin-top:30px;
+      box-shadow:0 4px 12px rgba(0,0,0,0.1);
+    }
+    th, td { padding:10px; border-bottom:1px solid #eee; font-size:14px; }
+    th { background:#007bff; color:white; text-align:left; }
   </style>
 </head>
 <body>
@@ -28,7 +37,6 @@
 <h1>Bienvenido al Sistema de Apartado de Proyector del Instituto Tecnológico de Oaxaca</h1>
 
 <form id="form">
-  
   <label>Nombre del Alumno</label>
   <input type="text" id="nombre" required>
 
@@ -71,10 +79,44 @@
   <button type="submit">Guardar Registro</button>
 </form>
 
+<!-- TABLA DE REGISTROS -->
+<table>
+  <thead>
+    <tr>
+      <th>Fecha</th>
+      <th>Horario</th>
+      <th>Nombre</th>
+      <th>Matrícula</th>
+      <th>Aula</th>
+      <th>Material</th>
+      <th>Carrera</th>
+    </tr>
+  </thead>
+  <tbody id="tbody"></tbody>
+</table>
+
 <script>
+// Cargar registros al inicio
+function cargarTabla() {
+  const registros = JSON.parse(localStorage.getItem("apartados") || "[]");
+  const tbody = document.getElementById("tbody");
+
+  tbody.innerHTML = registros.map(r => `
+    <tr>
+      <td>${r.fecha}</td>
+      <td>${r.hora}</td>
+      <td>${r.nombre}</td>
+      <td>${r.matricula || "N/A"}</td>
+      <td>${r.aula}</td>
+      <td>${(r.material || []).join(', ')}</td>
+      <td>${r.carrera}</td>
+    </tr>
+  `).join("");
+}
+
 document.getElementById("form").addEventListener("submit", e => {
   e.preventDefault();
-  
+
   const registros = JSON.parse(localStorage.getItem("apartados") || "[]");
 
   registros.push({
@@ -88,9 +130,15 @@ document.getElementById("form").addEventListener("submit", e => {
   });
 
   localStorage.setItem("apartados", JSON.stringify(registros));
-  alert("Registro guardado correctamente");
+
+  // Limpiar formulario y actualizar tabla
   e.target.reset();
+  cargarTabla();
+  alert("Registro guardado correctamente");
 });
+
+// Cargar tabla al abrir la página
+cargarTabla();
 </script>
 
 </body>
