@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Registros — Apartados de Proyector</title>
+  <style>
+    body { font-family: Segoe UI, Arial, sans-serif; background:#f6f7fb; margin:0; padding:20px; }
+    h1 { margin-bottom:15px; }
+    table { width:100%; border-collapse:collapse; background:white; box-shadow:0 4px 12px rgba(0,0,0,0.1); }
+    th, td { padding:10px; border-bottom:1px solid #eee; font-size:14px; }
+    th { background:#007bff; color:white; text-align:left; }
+  </style>
+</head>
+<body>
+
+<h1>Registros de Apartados</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Fecha</th>
+      <th>Horario</th>
+      <th>Alumno</th>
+      <th>Aula</th>
+      <th>Material</th>
+      <th>Carrera</th>
+    </tr>
+  </thead>
+  <tbody id="tbody"></tbody>
+</table>
+
+<script>
+const registros = JSON.parse(localStorage.getItem("apartados") || "[]");
+const tbody = document.getElementById("tbody");
+
+tbody.innerHTML = registros.map(r => `
+  <tr>
+    <td>${r.fecha}</td>
+    <td>${r.hora}</td>
+    <td>${r.nombre}</td>
+    <td>${r.aula}</td>
+    <td>${(r.material||[]).join(', ')}</td>
+    <td>${r.carrera}</td>
+  </tr>
+`).join("");
+</script>
+
+</body>
+</html>
