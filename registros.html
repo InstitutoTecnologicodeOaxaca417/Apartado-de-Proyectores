@@ -3,73 +3,108 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Registrar Apartado</title>
+<title>Registrar Apartado - Instituto Tecnológico de Oaxaca</title>
 
 <style>
-  body { font-family: Segoe UI, Arial; background:#f6f7fb; margin:0; padding:30px; }
-  h1 { background:#007bff; color:white; padding:15px; border-radius:8px; }
-  form { background:white; padding:20px; border-radius:10px; box-shadow:0 4px 12px rgba(0,0,0,0.1); max-width:400px; margin:auto; }
-  label { display:block; margin-top:10px; font-weight:bold; }
-  input, select { width:100%; padding:10px; margin-top:5px; border:1px solid #ccc; border-radius:5px; }
-  button { margin-top:20px; width:100%; padding:12px; background:#007bff; border:none; color:white; font-size:15px; border-radius:6px; cursor:pointer; }
-  button:hover { background:#005fcc; }
+  body {
+    font-family: Arial, sans-serif;
+    background: #e8ecf3;
+    margin: 0;
+    padding: 40px;
+  }
+  h1 {
+    text-align: center;
+    background: #1b4acc;
+    color: white;
+    padding: 15px;
+    border-radius: 8px;
+  }
+  .card {
+    background: white;
+    max-width: 480px;
+    margin: 30px auto;
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  }
+  label { font-weight: bold; margin-top: 12px; display: block; }
+  input, select {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    border: 1px solid #aaa;
+    border-radius: 6px;
+  }
+  button {
+    width: 100%;
+    margin-top: 25px;
+    padding: 12px;
+    background: #1b4acc;
+    color: white;
+    border: none;
+    font-size: 15px;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  button:hover { background: #0f2e7a; }
 </style>
+
 </head>
 <body>
 
 <h1>Registrar Apartado de Proyector</h1>
 
-<form id="form">
-  <label>Nombre del Alumno</label>
-  <input type="text" id="nombre" required>
+<div class="card">
+  <form id="form">
 
-  <label>Número de Control</label>
-  <input type="text" id="numeroControl" required>
+    <label>Nombre del Alumno</label>
+    <input type="text" id="nombre" required>
 
-  <label>Carrera</label>
-  <input type="text" id="carrera" required>
+    <label>Número de Control</label>
+    <input type="text" id="numeroControl" required>
 
-  <label>Aula</label>
-  <input type="text" id="aula" required>
+    <label>Carrera</label>
+    <input type="text" id="carrera" required>
 
-  <label>Fecha</label>
-  <input type="date" id="fecha" required>
+    <label>Aula</label>
+    <input type="text" id="aula" required>
 
-  <label>Horario (una hora)</label>
-  <select id="hora" required>
-    <option value="">Selecciona una hora</option>
-  </select>
+    <label>Fecha</label>
+    <input type="date" id="fecha" required>
 
-  <label>Material Solicitado</label>
-  <select id="material" multiple>
-    <option>Proyector</option>
-    <option>Adaptador HDMI</option>
-    <option>Cable VGA</option>
-    <option>Extensión</option>
-    <option>Control</option>
-  </select>
+    <label>Horario</label>
+    <select id="hora" required></select>
 
-  <button type="submit">Guardar Registro</button>
-</form>
+    <label>Material</label>
+    <select id="material" multiple>
+      <option>Proyector</option>
+      <option>Adaptador HDMI</option>
+      <option>Cable VGA</option>
+      <option>Extensión</option>
+      <option>Control</option>
+    </select>
+
+    <button type="submit">Guardar Apartado</button>
+  </form>
+</div>
 
 <script>
-// Crear horarios desde 7AM a 8PM en formato "07:00 AM"
+// Generar horarios en formato 07:00 AM
 const selectHora = document.getElementById("hora");
-
 for (let h = 7; h <= 20; h++) {
-  let formato24 = h;
   let sufijo = h >= 12 ? "PM" : "AM";
   let h12 = h % 12;
   if (h12 === 0) h12 = 12;
-  let horaTexto = `${String(h12).padStart(2,"0")}:00 ${sufijo}`;
-  selectHora.innerHTML += `<option value="${horaTexto}">${horaTexto}</option>`;
+  
+  let formato = `${String(h12).padStart(2,"0")}:00 ${sufijo}`;
+  selectHora.innerHTML += `<option value="${formato}">${formato}</option>`;
 }
 
-// Guardar registro
+// Guardar en localStorage
 document.getElementById("form").addEventListener("submit", function(e){
   e.preventDefault();
 
-  const registro = {
+  const datos = {
     nombre: nombre.value,
     numeroControl: numeroControl.value,
     carrera: carrera.value,
@@ -80,10 +115,10 @@ document.getElementById("form").addEventListener("submit", function(e){
   };
 
   const registros = JSON.parse(localStorage.getItem("apartados") || "[]");
-  registros.push(registro);
+  registros.push(datos);
   localStorage.setItem("apartados", JSON.stringify(registros));
 
-  alert("Registro guardado correctamente 🎉");
+  alert("Registro guardado correctamente!");
   this.reset();
 });
 </script>
